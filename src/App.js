@@ -1,23 +1,35 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useQuery } from "react-query";
+import axios from "axios";
 
 function App() {
+  const { isLoading, isError, data, error } = useQuery('data',
+    async () => {
+      const Data = await axios.get('https://jsonplaceholder.typicode.com/posts/1')
+      return Data.data
+    },
+    {
+      refetchOnWindowFocus: false,
+      retry: 0,
+      onSuccess: data => {
+        console.log(data);
+      },
+      onError: e => {
+        console.log(e.message);
+      }
+    })
+
+  if (isLoading) {
+    return <span>Loading...</span>;
+  }
+
+  if (isError) {
+    return <span>Error: {error.message}</span>;
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {data?.title}
     </div>
   );
 }
